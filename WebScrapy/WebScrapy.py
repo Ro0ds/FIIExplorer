@@ -1,4 +1,5 @@
 # Imports and Modules
+from textwrap import indent
 import requests
 
 from os import system
@@ -28,26 +29,36 @@ system('cls')
 fii_current_price = soup.find(class_='headerTicker__content__price').find('p').getText()
 fii_current_percent = soup.find(class_='headerTicker__content__price').find('span').getText().replace(',', '.')
 
-
-lista = []
 count = 0
 
-for div in soup.find(class_='basicInformation__grid').find_all(class_='basicInformation__grid__box'):
+for information in soup.find(class_='basicInformation__grid').find_all(class_='basicInformation__grid__box'):
     if count == 0:
         
-        fii_title = div.b.getText()
+        fii_title = information.b.getText()
     elif count == 4:
-        fii_destinated_public = div.b.getText()
+        fii_destinated_public = information.b.getText()
     elif count == 5:
-        fii_segment = div.b.getText()
+        fii_segment = information.b.getText()
     elif count == 6:
-        fii_type = div.b.getText()
+        fii_type = information.b.getText()
     elif count == 7:
-        fii_issued_shares = div.b.getText()
+        fii_issued_shares = information.b.getText()
     elif count == 8:
-        fii_number_of_shareholders = div.b.getText()
+        fii_number_of_shareholders = information.b.getText()
     count += 1
 
+count = 0
+for indicator in soup.find(class_='wrapper indicators', id='indicators'):
+    if count == 3:
+        fii_last_dividend = str(html_tags.remove_html_tags(str(indicator.small), 'small')) + str(indicator.b.getText())
+    elif count == 5:
+        fii_last_year_dividend = indicator.b.getText()
+    elif count == 11:
+        fii_month_profitability = indicator.b.getText()
+    elif count == 13:
+        fii_pvp = indicator.b.getText()
+    count += 1
+    
 # fixing , and . on prices
 fii_state = ''
 
@@ -65,11 +76,11 @@ print('MANDATO: {}' .format(fii_type))
 print('COTAS EMITIDAS: {}' .format(fii_issued_shares))
 print('N DE COTISTAS: {}\n' .format(fii_number_of_shareholders))
 
-print('COTACAO ATUAL: {} | {} | {}' .format(fii_current_price, fii_state, fii_current_percent))
-print('ULTIMO RENDIMENTO: ')
-print('DIVIDEND YIELD: ')
-print('RENTABILIDADE NO MES: ')
-print('P/VP: \n')
+print('COTACAO ATUAL: {} | {} | {}' .format(fii_current_price.replace(' ', ''), fii_state, fii_current_percent))
+print('ULTIMO RENDIMENTO: {}' .format(fii_last_dividend))
+print('DIVIDEND YIELD: {}' .format(fii_last_year_dividend.replace(' ', '')))
+print('RENTABILIDADE NO MES: {}' .format(fii_month_profitability.replace('\n', '').replace(' ', '')))
+print('P/VP: {}\n' .format(fii_pvp.replace('\n', '').replace(' ', '')))
 
 print('>> ULTIMOS 5 MESES <<')
 print('DATA DO PAGAMENTO: ')
