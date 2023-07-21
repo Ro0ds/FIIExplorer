@@ -1,9 +1,9 @@
 # Imports and Modules
-from textwrap import indent
 import requests
 
 from os import system
 from bs4 import BeautifulSoup
+from Entities import ScrapInfo
 from Filters import html_tags
 
 # Main Program
@@ -29,36 +29,12 @@ system('cls')
 fii_current_price = soup.find(class_='headerTicker__content__price').find('p').getText()
 fii_current_percent = soup.find(class_='headerTicker__content__price').find('span').getText().replace(',', '.')
 
-count = 0
+basic_information = ScrapInfo.FundInformation()
+indicator_information = ScrapInfo.FundInformation()
 
-for information in soup.find(class_='basicInformation__grid').find_all(class_='basicInformation__grid__box'):
-    if count == 0:
-        
-        fii_title = information.b.getText()
-    elif count == 4:
-        fii_destinated_public = information.b.getText()
-    elif count == 5:
-        fii_segment = information.b.getText()
-    elif count == 6:
-        fii_type = information.b.getText()
-    elif count == 7:
-        fii_issued_shares = information.b.getText()
-    elif count == 8:
-        fii_number_of_shareholders = information.b.getText()
-    count += 1
+fii_basic_information = basic_information.get_information_from_web(soup.find(class_='basicInformation__grid').find_all(class_='basicInformation__grid__box'))
+fii_indicator_information = indicator_information.get_information_from_web(soup.find(class_='indicators historic', id='indicators').find_all(class_='indicators__box'))
 
-count = 0
-for indicator in soup.find(class_='wrapper indicators', id='indicators'):
-    if count == 3:
-        fii_last_dividend = str(html_tags.remove_html_tags(str(indicator.small), 'small')) + str(indicator.b.getText())
-    elif count == 5:
-        fii_last_year_dividend = indicator.b.getText()
-    elif count == 11:
-        fii_month_profitability = indicator.b.getText()
-    elif count == 13:
-        fii_pvp = indicator.b.getText()
-    count += 1
-    
 # fixing , and . on prices
 fii_state = ''
 
@@ -69,20 +45,13 @@ else:
     
 # returning the result
 # TODO: return the result as JSON, to use as an API later
-print('RAZAO SOCIAL: {}' .format(fii_title))
-print('SEGMENTO: {}' .format(fii_segment))
-print('PUBLICO ALVO: {}' .format(fii_destinated_public))
-print('MANDATO: {}' .format(fii_type))
-print('COTAS EMITIDAS: {}' .format(fii_issued_shares))
-print('N DE COTISTAS: {}\n' .format(fii_number_of_shareholders))
+print('COTACAO ATUAL: {} | {} | {}\n' .format(fii_current_price.replace(' ', ''), fii_state, fii_current_percent))
 
-print('COTACAO ATUAL: {} | {} | {}' .format(fii_current_price.replace(' ', ''), fii_state, fii_current_percent))
-print('ULTIMO RENDIMENTO: {}' .format(fii_last_dividend))
-print('DIVIDEND YIELD: {}' .format(fii_last_year_dividend.replace(' ', '')))
-print('RENTABILIDADE NO MES: {}' .format(fii_month_profitability.replace('\n', '').replace(' ', '')))
-print('P/VP: {}\n' .format(fii_pvp.replace('\n', '').replace(' ', '')))
+for information_value in fii_basic_information:
+    for information_name in information_value:
+        print('{}: {}' .format(information_name, information_value[information_name]))
 
-print('>> ULTIMOS 5 MESES <<')
+print('\n>> ULTIMOS 5 MESES <<')
 print('DATA DO PAGAMENTO: ')
 print('COTACAO: ')
 print('VALOR: ')
