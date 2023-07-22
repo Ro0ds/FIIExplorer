@@ -21,9 +21,6 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="API\api_configuration.py">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Entities\ScrapInfo.py" />
     <Compile Include="Entities\__init__.py" />
     <Compile Include="Filters\html_tags.py">
